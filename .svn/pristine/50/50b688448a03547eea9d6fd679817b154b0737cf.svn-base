@@ -1,0 +1,91 @@
+package ua.nure.danylenko.practice6.part1;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class WordContainer extends ArrayList {
+
+    private List<Word> list;
+
+    WordContainer(){
+        list = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(Word w:list){
+            sb.append("["+w.content+" = "+w.frequency+"]");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public boolean add(Object o) {
+        Word word=(Word)o;
+        if(!list.contains(word)){
+           word.frequency=word.frequency+1;
+           return list.add(word);
+        }else{
+            int i=list.indexOf(word);
+            list.get(i).frequency = list.get(i).frequency+1;
+        }
+        return false;
+    }
+
+
+    public static void main(String[] args){
+        WordContainer wc = new WordContainer();
+
+        Scanner s = new Scanner(System.in);
+        StringBuilder sb = new StringBuilder();
+        while (s.hasNextLine()) {
+            String line = s.nextLine();
+            sb.append(line).append(System.lineSeparator());
+            if(line.contains("stop")) {
+
+
+                break;
+            }
+        }
+        String[] words = sb.toString().split(" |(\r\n)|\r|\n");
+        for(String str:words){
+            wc.add(new Word(str));
+        }
+        //System.out.println(wc.toString())
+        wc.sortFrequency();
+    }
+
+    private void sortFrequency(){
+        for(int i=list.size()-1; i>=1; i--){
+            for(int j=0; j<i; j++) {
+                if (list.get(j).frequency < list.get(j + 1).frequency) {
+                    Word temp = list.get(j);
+                    list.set(j, list.get(j + 1));
+                    list.set((j + 1), temp);
+                }
+            }
+        }
+
+        for(int k=0; k<list.size()-1; k++){
+            for(int j=0; j<k; j++) {
+                if (list.get(j).frequency == list.get(j + 1).frequency) {
+                    if (list.get(j + 1).content.compareTo(list.get(j).content) < 0) {
+                        Word temp1 = list.get(j);
+                        list.set(j, list.get(j + 1));
+                        list.set((j + 1), temp1);
+                    }
+                }
+            }
+        }
+
+        for(int i=0; i<list.size()-1; i++){
+            System.out.println(list.get(i).content+" : "+
+                    list.get(i).frequency);
+        }
+    }
+
+
+
+}

@@ -1,0 +1,48 @@
+package ua.nure.danylenko.practice6.part6;
+
+public class LatinWord implements Comparable{
+    public String content;
+    public int frequency;
+    public int letters;
+
+    LatinWord(String word){
+        this.content=word;
+        this.frequency=1;
+        this.letters=0;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        LatinWord word = (LatinWord)obj;
+        //System.out.println("equals " + content.compareTo(word.content))
+        if(content.compareTo(word.content)==0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return content.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return ""+content+": "+frequency+System.lineSeparator();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        LatinWord lw=(LatinWord)o;
+        if(this.content.charAt(0)==lw.content.charAt(0)){
+            return 0;
+        }else if(this.content.charAt(0)>lw.content.charAt(0)){
+            return 1;
+        }else{
+            return -1;
+        }
+    }
+}
+
+

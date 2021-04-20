@@ -1,0 +1,306 @@
+package ua.nure.danylenko.practice6.part5;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Tree<E extends Comparable<E>> {
+
+    private Node<E> root;
+    private int size;
+    // вложенный класс, объекты этого класса составляют дерево
+    private static class Node<E> {
+        private Node<E> previous;
+        private Node<E> leftChild;
+        private Node<E> rightChild;
+        StringBuilder spaces;
+        private E value;
+
+        Node(){  }
+
+        Node(E val){
+            value= val;
+            previous= new Node<>();
+            spaces = new StringBuilder();
+        }
+    }
+
+    Tree(){
+
+    }
+
+    // добавляет элемент в контейнер
+    // если в контейнере есть элемент равный по compareTo добавляемому,
+    // то добавления не происходит и метод возвращает false
+    // в противном случае элемент попадает в контейнер и метод возвращает true
+    // первый добавляемый элемент становится корнем дерева
+    // автобалансировки в дереве нет
+    private boolean add(E element) {
+        if(root==null){
+            root=new Node<E>(element);
+            root.leftChild=null;
+            root.rightChild=null;
+            root.previous=null;
+            root.spaces.append("");
+            size=size+1;
+            return true;
+        }else{
+            return  findPlaceToAdd(root,element);
+
+        }
+    }
+
+    public boolean findPlaceToAdd(Node<E> node, E element) {
+        if(node.value.compareTo(element)==0){
+            return false;
+        }else if(node.value.compareTo(element)==1){
+            if(node.rightChild==null){
+                node.rightChild=new Node<E>(element);
+                node.rightChild.previous=node;
+                node.rightChild.spaces.append(node.spaces).append("  ");
+                size=size+1;
+                return true;
+            }else{
+                return findPlaceToAdd(node.rightChild,element);
+            }
+        } else if(node.value.compareTo(element)==-1) {
+            if (node.leftChild == null) {
+                node.leftChild = new Node<E>(element);
+                node.leftChild.previous=node;
+                node.leftChild.spaces.append(node.spaces).append("  ");
+                size=size+1;
+                return true;
+            } else {
+                return findPlaceToAdd(node.leftChild, element);
+            }
+        }
+            return false;
+    }
+
+    // добавляет все элементы из массива в контейнер (вызов в цикле метода add, см. выше)
+    public void add(E[] elements) {
+        for(E el:elements){
+            this.add(el);
+        }
+    }
+
+    // удаляет элемент из контейнера
+    // если удаляемого элемента в контейнере нет, то возвращает false
+    // в противном случае удаляет элемент и возвращает true
+    // ВАЖНО! при удалении элемента дерево не должно потерять свойства бинарного дерева поиска
+    public boolean remove(E element) {
+        Node<E> toRemove=findElement(root,element);
+        if(toRemove!=null){
+            return this.delete(toRemove);
+        }
+        return false;
+    }
+
+    //1. Если у узла нет дочерних узлов, то у его родителя нужно заменить соответствующий
+    // указатель на null.
+    //2. Если у узла есть только один дочерний узел, то нужно создать новую связь между
+    // родителем удаляемого узла и его дочерним узлом.
+    //3. Если у узла два дочерних узла, то нужно
+    //3.1. найти следующий за ним элемент (у этого элемента не будет правого потомка)
+    //3.2. его левого потомка подвесить на место найденного элемента
+    //3.3. удаляемый узел заменить найденным узлом.
+    private boolean delete(Node<E> node) {
+        Node<E> father = node.previous;
+        if(node.rightChild==null&&node.leftChild==null){
+            if(father.leftChild!=null&&father.leftChild.value.compareTo(node.value)==0){
+                node.spaces=null;
+                node.value=null;
+                //node.previous=null;
+                father.leftChild=null;
+            }else{
+                node.spaces=null;
+                node.value=null;
+                //node.previous=null;
+                father.rightChild=null;
+            }
+            size=size-1;
+            return true;
+        }else if(node.rightChild==null&&node.leftChild!=null){
+            if(father.leftChild.value.compareTo(node.value)==0){
+                father.leftChild=node.leftChild;
+            }else{
+                father.rightChild=node.leftChild;
+            }
+            size=size-1;
+            return true;
+        }else if(node.leftChild==null&&node.rightChild!=null){
+            if(father.leftChild.value.compareTo(node.value)==0){
+                father.leftChild=node.rightChild;
+            }else{
+                father.rightChild=node.rightChild;
+            }
+            size=size-1;
+            return true;
+        }else if(node.leftChild!=null&&node.rightChild!=null){
+            Node<E> temp=node;
+            while(temp.rightChild!=null) {
+                temp=temp.leftChild;
+            }
+            if(temp.leftChild==null){
+                temp.rightChild=node.rightChild;
+                temp.rightChild.previous=temp;
+                father.leftChild=temp;
+                father.leftChild.previous=node.previous;
+                father.leftChild.spaces.setLength(father.leftChild.spaces.length()-2);
+            }
+            node.leftChild=null;
+            node.rightChild=null;
+            node.value=null;
+            node.spaces=null;
+            node.previous=null;
+            size=size-1;
+            return true;
+        }
+        return false;
+    }
+
+
+    private Node<E> findElement(Node<E> node, E element) {
+        if(node.value.compareTo(element)==0){
+            return node;
+        }else if(node.value.compareTo(element)==-1){
+            if(node.leftChild.value.compareTo(element)==0){
+                return node.leftChild;
+            }else if(node.leftChild!=null) {
+                return findElement(node.leftChild,element);
+            }
+        } else if(node.value.compareTo(element)==1) {
+            if (node.rightChild.value.compareTo(element)==0) {
+                return node.rightChild;
+            } else if(node.rightChild!=null) {
+                return findElement(node.rightChild, element);
+            }
+        }
+        return null;
+    }
+
+    // распечатывает дерево, так чтобы было видно его древовидную структуру, см. ниже пример
+    public void outTree() {
+        List<Node<E>> output = new ArrayList<>();
+        Node<E> temp=this.root;
+        Node<E> father=this.root;
+        while(temp.rightChild!=null&&temp.leftChild!=null) {
+            father=temp;
+            temp=temp.rightChild;
+        }
+        output.add(temp);
+        getLefts(father,output);
+
+        output.add(root);
+
+        Node<E> temp2=this.root;
+        Node<E> father2=this.root;
+        while(temp2.leftChild!=null) {
+            father2=temp2;
+            temp2=father2.leftChild;
+
+        }
+        getRights(father2, output);
+        showTree(output);
+    }
+
+    private void showTree(List<Node<E>> output) {
+        for(Node node:output){
+            System.out.println(node.spaces.toString()+node.value);
+        }
+    }
+
+    private void getRights(Node<E> father,List<Node<E>> output){
+        List<Node<E>> reverse = new ArrayList<>();
+
+            reverse.add(father.leftChild);
+        if(father.leftChild.rightChild!=null){
+            reverse.add(father.leftChild.rightChild);
+        }
+
+        if(father!=root) {
+            reverse.add(father);
+            if (father.rightChild != null) {
+                Node<E> temp = father.rightChild;
+                while (temp.leftChild != null && temp.rightChild != null) {
+                    temp = temp.leftChild;
+                }
+                reverse.add(temp);
+            }
+        }
+//        }else {
+//            Node<E> leftPreFather=father.leftChild;
+//            if (leftPreFather.rightChild != null){
+//                reverse.add(leftPreFather.rightChild);
+//            }
+//        }
+
+        for(int i=reverse.size()-1; i>=0; i--){
+            output.add(reverse.get(i));
+        }
+    }
+
+    private void getLefts(Node<E> father,List<Node<E>> output){
+        output.add(father);
+        if(father.leftChild!=null){
+            Node<E> temp=father.leftChild;
+            while(temp.rightChild!=null&&temp.leftChild!=null) {
+                temp=temp.rightChild;
+            }
+            output.add(temp);
+            if(father.leftChild.leftChild!=null){
+                getLefts(father.leftChild,output);
+            }
+        }
+    }
+
+    // распечатывает дерево, так чтобы было видно его древовидную структуру, см. ниже пример
+    public void print() {
+        StringBuilder spaces = new StringBuilder();
+        Node<E> temp=this.root;
+        Node<E> father=this.root;
+        while(temp.rightChild!=null&&temp.leftChild!=null) {
+            father=temp;
+            spaces.append("  ");
+            temp=temp.rightChild;
+        }
+        System.out.print(spaces.toString()+ temp.value+System.lineSeparator());
+        spaces=printRightFamily(father,spaces);
+
+
+        StringBuilder spaces2 = new StringBuilder();
+        Node<E> temp2=this.root;
+        Node<E> father2=this.root;
+        while(temp2.leftChild!=null&&temp2.rightChild!=null) {
+            father2=temp2;
+            spaces2.append("  ");
+            temp2=temp2.leftChild;
+        }
+
+        if(temp2.rightChild!=null){
+            father2=temp2;
+            spaces2.append("  ");
+            temp2=father2.rightChild;
+        }
+        if(father2.value!=this.root.value) {
+            System.out.print(spaces.substring(2,spaces.length()) + root.value+System.lineSeparator());
+            System.out.print(spaces2.toString() + father2.rightChild.value + System.lineSeparator());
+            printRightFamily(father2, spaces2);
+        }else {
+
+            printRightFamily(father2, spaces2);
+        }
+    }
+
+    private StringBuilder printRightFamily(Node<E> father,StringBuilder spaces) {
+        StringBuilder result = new StringBuilder();
+        result.append(spaces.substring(2,spaces.length())).append(father.value).append(System.lineSeparator());
+        if(father.leftChild!=null){
+            result.append(spaces).append(father.leftChild.value).append(System.lineSeparator());
+        }
+        System.out.print(result);
+        return spaces.delete(0,2);
+    }
+
+
+}
+

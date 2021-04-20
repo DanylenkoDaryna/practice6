@@ -1,0 +1,148 @@
+package ua.nure.danylenko.practice6.part2;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+public class Part2 {
+    private static final int HUMANS = 20_000;
+
+    private static long removeByIndex(List<Integer> list, int k) {
+        int index = 0;
+        long startTime = System.currentTimeMillis();
+        while(list.size()!=2){
+            index=removeHumanIndex(list, index, k);
+            //System.out.println(list);
+        }
+        if(k%2!=0){
+            list.remove(index);
+        }else{
+            if(index==0) {
+                list.remove((index + 1));
+            }else{
+                list.remove(index - 1);
+            }
+        }
+        return  System.currentTimeMillis() - startTime;
+    }
+
+    private static int delete(List<Integer> list, int offset, int index){
+        int offset2=offset-(list.size()-1);
+        if(offset2-1>list.size()-1){
+            return delete(list,offset2-1,index);
+        }else {
+            Object temp = list.get(offset2 - 1);
+            list.remove(index);
+            index = list.indexOf(temp);
+        }
+        return index;
+    }
+
+    private static int delete2(List<Integer> list, int offset2, int index){
+        int offset3=(offset2-1)-(list.size()-1);
+        if(offset3-1>list.size()-1){
+            delete2(list,offset3,index);
+        }else{
+            list.remove(0 + (offset3-1));
+        }
+        return index;
+    }
+
+    private static int removeHumanIndex(List<Integer> list, int index, int k){
+
+        if(index==list.size()-1){
+            int offset=(index+(k-1))-(list.size()-1);
+            if(offset>list.size()-1){
+                index = delete(list,offset,index);
+            }else {
+                Object temp = list.get(offset);
+                index = offset - 1;
+                list.remove(index);
+                index = list.indexOf(temp);
+            }
+        } else{
+            if(index+k>list.size()-1){
+                int offset2=(index+k)-(list.size()-1);
+                if(0+offset2-1>list.size()-1){
+                    index =  delete2(list,offset2,index);//?index =
+//                    int offset3=(offset2-1)-(list.size()-1);
+//                    list.remove(0 + (offset3 - 1-1));
+                }else {
+                    Object temp2 = list.get(0 + offset2 - 1);
+                    if (index + (k - 1) > list.size() - 1) {
+                        list.remove(0 + (offset2 - 1 - 1));
+                    } else {
+                        list.remove(index + (k - 1));
+                    }
+                    index = list.indexOf(temp2);
+                }
+            }else {
+                Object temp2 = list.get(index + k);
+                list.remove(index + (k - 1));
+                index = list.indexOf(temp2);
+            }
+        }
+        return index;
+    }
+
+    private static long removeByIterator(List<Integer> list, int k) {
+
+        Iterator iterator = list.iterator();
+        long startTime = System.currentTimeMillis();
+        while(list.size()!=1){
+            iterator=removeHumanIterator(list, iterator,k);
+        }
+        return  System.currentTimeMillis() - startTime;
+    }
+
+    private static Iterator removeHumanIterator(List<Integer> list, Iterator iterator, int k) {
+        int counter = 0;
+        while (iterator.hasNext()&&counter!=k){
+            iterator.next();
+            counter=counter+1;
+            if(!iterator.hasNext()&&counter!=k){
+                iterator = list.iterator();
+            }else if(!iterator.hasNext()&&counter==k){
+                iterator.remove();
+                iterator = list.iterator();
+                return iterator;
+            }
+        }
+        iterator.remove();
+        return iterator;
+    }
+
+    public static void main(String[] args){
+
+        List<Integer> list = new ArrayList<>();
+        fillList(list);
+        System.out.printf("ArrayList#Index: %d ms",removeByIndex(list,20));
+        System.out.print(System.lineSeparator());
+
+        List<Integer> linkedList = new LinkedList<>();
+        fillList(linkedList);
+        System.out.printf("LinkedList#Index: %d ms",removeByIndex(linkedList,20));
+        System.out.print(System.lineSeparator());
+
+        List<Integer> list2 = new ArrayList<>();
+        fillList(list2);
+        System.out.printf("ArrayList#Iterator: %d ms",removeByIterator(list2,20));
+        System.out.print(System.lineSeparator());
+
+        List<Integer> linkedList2 = new LinkedList<>();
+        fillList(linkedList2);
+        System.out.printf("LinkedList#Iterator: %d ms",removeByIterator(linkedList2,20));
+        System.out.print(System.lineSeparator());
+    }
+
+
+
+    private static void fillList(List<Integer> list){
+        for(int i=0; i<HUMANS; i++){
+            list.add(i);
+        }
+    }
+
+
+}

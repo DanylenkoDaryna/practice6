@@ -1,0 +1,28 @@
+package ua.nure.danylenko.practice6.part1;
+
+
+public class Word {
+
+    public String content;
+    public int frequency;
+
+    Word(String word){
+        this.content=word;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Word word = (Word)obj;
+        //System.out.println("equals " + content.compareTo(word.content))
+        if(content.compareTo(word.content)==0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return content.hashCode();
+    }
+}
