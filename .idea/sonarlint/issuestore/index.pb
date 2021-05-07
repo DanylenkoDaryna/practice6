@@ -33,3 +33,6 @@ Y
 )src/ua/nure/danylenko/practice6/Demo.java,2\8\28d25de013b542c695837c8731cfd0993c70f2d4
 d
 4src/ua/nure/danylenko/practice6/part6/LatinWord.java,0\7\07c5979c80e10a97609455ba5499c301f80cf876
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
