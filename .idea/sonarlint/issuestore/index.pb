@@ -36,3 +36,7 @@ d
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+`
+0src/ua/nure/danylenko/practice6/part7/Part7.java,b\6\b68239123f804c2bfb5bad16787eb2d151d96501
+`
+0src/ua/nure/danylenko/practice6/part8/Part8.java,8\5\854efdbc7753f1a3b3e1f9951c1488fce81e0117
